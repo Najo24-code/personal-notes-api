@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <header class="bg-blue-500 text-white p-4 text-center">
+        <h1 class="text-3xl">Nota App</h1>
+    </header>
+    <main class="p-4">
+        <section class="mb-4">
+            <h2 class="text-2xl">Crear Nota</h2>
+            <form id="form-crear-nota">
+                <label for="titulo" class="block text-gray-700">Título:</label>
+                <input type="text" id="titulo" name="titulo" class="block w-full p-2 mb-2 border border-gray-400">
+                <label for="contenido" class="block text-gray-700">Contenido:</label>
+                <textarea id="contenido" name="contenido" class="block w-full p-2 mb-2 border border-gray-400"></textarea>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Crear</button>
+            </form>
+        </section>
+        <section class="mb-4">
+            <h2 class="text-2xl">Listar Notas</h2>
+            <ul id="lista-notas" class="list-none p-0 m-0"></ul>
+        </section>
+    </main>
+
+    <script>
+        const formCrearNota = document.getElementById('form-crear-nota');
+        const listaNotas = document.getElementById('lista-notas');
+
+        formCrearNota.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const titulo = document.getElementById('titulo').value;
+            const contenido = document.getElementById('contenido').value;
+
+            try {
+                const respuesta = await fetch('http://localhost:8000/notas/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ titulo, contenido })
+                });
+
+                if (respuesta.ok) {
+                    const notaCreada = await respuesta.json();
+                    console.log(notaCreada);
+                    listarNotas();
+                } else {
+                    console.error('Error al crear nota');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
+        async function listarNotas() {
+            try {
+                const respuesta = await fetch('http://localhost:8000/notas/');
+                if (respuesta.ok) {
+                    const notas = await respuesta.json();
+                    listaNotas.innerHTML = '';
+                    notas.forEach((nota) => {
+                        const elementoNota = document.createElement('li');
+                        elementoNota.classList.add('p-2', 'border', 'border-gray-400', 'mb-2');
+                        elementoNota.innerHTML = `
+                            <h3>${nota.titulo}</h3>
+                            <p>${nota.contenido}</p>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="eliminarNota(${nota.id})">Eliminar</button>
+                        `;
+                        listaNotas.appendChild(elementoNota);
+                    });
+                } else {
+                    console.error('Error al listar notas');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function eliminarNota(idNota) {
+            try {
+                const respuesta = await fetch(`http://localhost:8000/notas/${idNota}`, {
+                    method: 'DELETE'
+                });
+
+                if (respuesta.ok) {
+                    console.log('Nota eliminada con éxito');
+                    listarNotas();
+                } else {
+                    console.error('Error al eliminar nota');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        listarNotas();
+    </script>
+</body>
+</html>
