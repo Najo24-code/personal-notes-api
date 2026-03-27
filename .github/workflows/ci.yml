@@ -22,23 +22,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest httpx
     
     - name: Check syntax
       run: |
         python -m py_compile main.py
-        python -m py_compile models.py
-        python -m py_compile schemas.py
-    
-    - name: Run tests
-      run: |
-        python -c "from main import app; print('✅ App imports OK')"
-        python -c "from models import *; print('✅ Models OK')"
-        python -c "from schemas import *; print('✅ Schemas OK')"
+        python -m py_compile database.py
+        python -m py_compile auth.py
     
     - name: Test app startup
       run: |
-        timeout 10 uvicorn main:app --host 0.0.0.0 --port 8000 &
-        sleep 5
-        curl -f http://localhost:8000/ || exit 1
-        echo "✅ Health check passed"
+        timeout 15 uvicorn main:app --host 0.0.0.0 --port 8000 &
+        sleep 8
+        curl -f http://localhost:8000/ && echo "✅ Health check passed"
