@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      DATABASE_URL: "sqlite:///./test.db"
+      DATABASE_URL: "sqlite:///:memory:"
     
     steps:
     - uses: actions/checkout@v4
@@ -31,9 +31,10 @@ jobs:
         python -m py_compile main.py
         python -m py_compile database.py
         python -m py_compile auth.py
+        echo "✅ Syntax OK"
     
-    - name: Test app startup
+    - name: Test health endpoint
       run: |
         uvicorn main:app --host 0.0.0.0 --port 8000 &
         sleep 5
-        curl -f http://localhost:8000/ && echo "✅ Health check passed"
+        curl -sf http://localhost:8000/ | grep -q "ok" && echo "✅ Health check passed"
