@@ -1,5 +1,8 @@
 # personal-notes-api
 
+![CI](https://github.com/Najo24-code/personal-notes-api/workflows/CI/badge.svg)
+
+
 API de notas personales con autenticación JWT y CRUD completo
 
 ![Python](https://img.shields.io/badge/-Python-blue) ![FastAPI](https://img.shields.io/badge/-FastAPI-blue) ![SQLite](https://img.shields.io/badge/-SQLite-blue)
