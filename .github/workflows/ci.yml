@@ -10,6 +10,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
+    env:
+      DATABASE_URL: "sqlite:///./test.db"
+    
     steps:
     - uses: actions/checkout@v4
     
@@ -31,6 +34,6 @@ jobs:
     
     - name: Test app startup
       run: |
-        timeout 15 uvicorn main:app --host 0.0.0.0 --port 8000 &
-        sleep 8
+        uvicorn main:app --host 0.0.0.0 --port 8000 &
+        sleep 5
         curl -f http://localhost:8000/ && echo "✅ Health check passed"
